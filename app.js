@@ -5,6 +5,7 @@ const sqlite3 = require("sqlite3");
 const { open } = require("sqlite");
 const path = require("path");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const dbPath = path.join(__dirname, "userData.db");
 let db = null;
@@ -15,7 +16,9 @@ initializeDatabaseServer = async () => {
       filename: dbPath,
       driver: sqlite3.Database,
     });
-    app.listen(3000, () => console.log("Server Running...."));
+    app.listen(process.env.PORT | 3000, () =>
+      console.log("Server Running....")
+    );
   } catch (e) {
     console.log(`Database Error ${e.message}`);
     process.exit(1);
@@ -60,6 +63,10 @@ app.post("/login", async (request, response) => {
     let comparePassword = await bcrypt.compare(password, userHashedPassword);
     if (comparePassword === true) {
       response.status(200);
+      response.send({
+        jwt_token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNzAwNDgxMjI2fQ.NJoZTtingFb_mIVwHg92MGHlW5Nkdltc0zHwWu6sEFQ",
+      });
       response.send("Login success!");
     } else {
       response.status(400);
